@@ -4,7 +4,12 @@ import numpy as np
 import random
 
 # Authenticate and load data from Google Sheets
-gc = pygsheets.authorize(service_file='C:\\Users\\yourb\\OneDrive\\Desktop\\Genetic Algorithim\\genetic-alg-db30145480cf.json')
+#uncomment for windows 
+#gc = pygsheets.authorize(service_file='C:\\Users\\yourb\\OneDrive\\Desktop\\Genetic Algorithim\\genetic-alg-db30145480cf.json')
+
+#uncomment for mac
+gc = pygsheets.authorize(service_file='/Users/malikfreeman/Desktop/Grad school/Genetic Algorithms /Gernetic-algorithims-Proj/genetic-alg-db30145480cf.json')
+
 sh = gc.open('NBAGA')
 wks = sh[0]
 df = wks.get_as_df()
