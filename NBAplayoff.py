@@ -2,14 +2,10 @@ import pygsheets
 import pandas as pd
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 # Authenticate and load data from Google Sheets
-#uncomment for windows 
-#gc = pygsheets.authorize(service_file='C:\\Users\\yourb\\OneDrive\\Desktop\\Genetic Algorithim\\genetic-alg-db30145480cf.json')
-
-#uncomment for mac
-gc = pygsheets.authorize(service_file='/Users/malikfreeman/Desktop/Grad school/Genetic Algorithms /Gernetic-algorithims-Proj/genetic-alg-db30145480cf.json')
-
+gc = pygsheets.authorize(service_file='C:\\Users\\yourb\\OneDrive\\Desktop\\Genetic Algorithim\\Gernetic-algorithims-Proj\\genetic-alg-db30145480cf.json')
 sh = gc.open('NBAGA')
 wks = sh[0]
 df = wks.get_as_df()
@@ -39,10 +35,14 @@ def crossover_mutation(selected_teams_df):
 
     return selected_teams_df
 
-# Main simulation loop with fixed number of generations (50)
-def simulate_generations(df, num_generations=50):
+def simulate_generations(df, num_generations=200):
+    avg_fitness_scores = []  # List to store average fitness scores for each generation
+    
     for generation in range(num_generations):
         df['Fitness Score'] = df.apply(lambda row: fitness(row.to_dict(), playoff_averages), axis=1)
+        avg_fitness = df['Fitness Score'].mean()
+        avg_fitness_scores.append(avg_fitness)  # Append average fitness score to list
+        
         selected_teams_df = df.nlargest(8, 'Fitness Score').copy()
         
         selected_teams_df = crossover_mutation(selected_teams_df)
@@ -50,10 +50,20 @@ def simulate_generations(df, num_generations=50):
         for idx in selected_teams_df.index:
             df.loc[idx] = selected_teams_df.loc[idx]
         
-        # Print numbered teams and generation info
-        print(f"Generation {generation + 1}")
-        display_df = selected_teams_df[['Team', 'Fitness Score']].reset_index(drop=True)
-        display_df.index += 1  # Adjust index to start from 1 for team numbering
-        print(display_df, "\n")
+        # Print only the top 3 generations
+        if generation >= num_generations - 3:
+            print(f"Generation {generation + 1}")
+            display_df = selected_teams_df[['Team', 'Fitness Score']].reset_index(drop=True)
+            display_df.index += 1  # Adjust index to start from 1 for team numbering
+            print(display_df, "\n")
+    
+    # Plot average fitness scores
+    plt.plot(range(1, num_generations + 1), avg_fitness_scores)
+    plt.xlabel('Generation')
+    plt.ylabel('Average Fitness Score')
+    plt.title('Average Fitness Score per Generation')
+    plt.grid(True)
+    plt.show()
 
+# Call the simulation function
 simulate_generations(df)
