@@ -1,1 +1,0 @@
-# Gernetic-algorithims-Proj
